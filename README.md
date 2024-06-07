@@ -5,11 +5,15 @@
 
 En este repositorio, encontrarás una variedad de recursos, incluyendo:
 
-1.     Apuntes y notas de clases 📖: Documentos detallados y resúmenes de las materias relacionadas con las telecomunicaciones.
-2.     Proyectos y trabajos prácticos 🛠️: Ejemplos de proyectos y prácticas que pueden servir de referencia o inspiración.
-3.     Artículos y publicaciones 📝: Análisis y ensayos sobre temas avanzados y tendencias actuales en el campo.
-4.     Tutoriales y guías 📘: Instrucciones paso a paso para realizar tareas específicas y entender conceptos complejos.
-5.     Recursos adicionales 🌐: Enlaces a libros, herramientas y otros recursos útiles.
+- Apuntes y notas de clases 📖: Documentos detallados y resúmenes de las materias relacionadas con las telecomunicaciones.
+
+- Proyectos y trabajos prácticos 🛠️: Ejemplos de proyectos y prácticas que pueden servir de referencia o inspiración.
+
+- Artículos y publicaciones 📝: Análisis y ensayos sobre temas avanzados y tendencias actuales en el campo.
+
+- Tutoriales y guías 📘: Instrucciones paso a paso para realizar tareas específicas y entender conceptos complejos.
+
+- Recursos adicionales 🌐: Enlaces a libros, herramientas y otros recursos útiles.
 
 Cómo contribuir 🤝:
 Este repositorio es un esfuerzo colaborativo, y siempre estamos buscando nuevas contribuciones. Si tienes algo que compartir, ya sea un documento, una guía o cualquier otro tipo de recurso, no dudes en hacer un fork de este repositorio y enviar un pull request. Apreciamos todo tipo de aportes, desde correcciones menores hasta nuevos contenidos completos.
