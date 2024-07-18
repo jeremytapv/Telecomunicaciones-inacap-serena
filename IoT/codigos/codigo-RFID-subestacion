@@ -1,0 +1,139 @@
+#include <Servo.h>
+#include <LiquidCrystal_I2C.h>
+#include <SPI.h>
+#include <MFRC522.h>
+#include <Adafruit_NeoPixel.h>
+
+#define SS_PIN 10
+#define RST_PIN 9
+#define BUZZER_PIN 8     // Define el pin del zumbador
+#define NEOPIXEL_PIN 7   // Define el pin del anillo de NeoPixel
+#define NUM_PIXELS 16    // Número de píxeles en el anillo NeoPixel
+
+// Estructura para almacenar UID y nombres
+struct User {
+  String name;
+  String uid;
+};
+
+User users[] = {
+  {"Jeremy T.", "F9 78 C7 98"},
+  {"Rodrigo L.", "37 00 02 34"},
+  {"Daniel R.", "67 11 AD 51"},
+  {"Daniel R.", "8B E3 5D 1B"},
+  {"Invitado 2", "56 94 9B F8"},
+  {"Invitado 2", "1B D9 B4 79"},
+  {"Invitado 3", "02 71 6E D2"},
+  {"Invitado 4", "EB 1A 3C A0"},
+  {"Sebastian M.", "B6 C8 9A 47"},
+};
+const int numUsers = sizeof(users) / sizeof(users[0]);
+
+byte lock = 0;
+Servo servo;
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+MFRC522 rfid(SS_PIN, RST_PIN);
+Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
+
+void setup() {
+  Serial.begin(9600);
+  servo.write(70);
+  lcd.init();
+  lcd.backlight();
+  servo.attach(3);
+  SPI.begin();
+  rfid.PCD_Init();
+
+  pinMode(BUZZER_PIN, OUTPUT);  // Configura el pin del zumbador como salida
+  pixels.begin();               // Inicializa el anillo NeoPixel
+  pixels.show();                // Apaga todos los píxeles
+}
+
+void loop() {
+  lcd.setCursor(2.9, 0);
+  lcd.print("Bienvenido!");
+  lcd.setCursor(0, 1);
+  lcd.print("Presente tarjeta");
+  //lcd.scrollDisplayLeft();
+    //                                                                                                                                                                                                                                            delay(200);
+
+
+  if (!rfid.PICC_IsNewCardPresent())
+    return;
+  if (!rfid.PICC_ReadCardSerial())
+    return;
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Escaneando");
+  Serial.print("NUID tag is :");
+  String ID = "";
+  for (byte i = 0; i < rfid.uid.size; i++) {
+    lcd.print(".");
+    ID.concat(String(rfid.uid.uidByte[i] < 0x10 ? " 0" : " "));
+    ID.concat(String(rfid.uid.uidByte[i], HEX));
+    delay(300);
+  }
+  ID.toUpperCase();
+
+  // Buscar el nombre del usuario según el UID
+  String userName = "";
+  for (int i = 0; i < numUsers; i++) {
+    if (ID.substring(1) == users[i].uid) {
+      userName = users[i].name;
+      break;
+    }
+  }
+
+  if (userName != "" && lock == 0) {
+    servo.write(70);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Puerta Cerrada");
+    //lcd.print("Adios " + userName);
+    lcd.setCursor(0, 1);
+    lcd.print(userName);
+    digitalWrite(BUZZER_PIN, LOW);  // Apaga el zumbador
+    setNeoPixelColor(255, 255, 0);  // Amarillo
+    delay(1500);
+    pixels.clear();      // Apaga todos los píxeles
+    pixels.show();
+    lcd.clear();
+    lock = 1;
+  } else if (userName != "" && lock == 1) {
+    servo.write(180);
+    lcd.clear();
+    //lcd.setCursor(0, 0);
+    //lcd.print("Bienvenido " + userName);
+    lcd.setCursor(0, 0);
+    lcd.print("Acceso Concedido");
+    lcd.setCursor(0, 1);
+    lcd.print(userName);
+    digitalWrite(BUZZER_PIN, LOW);  // Apaga el zumbador
+    setNeoPixelColor(0, 255, 0);  // Verde
+    delay(1500);
+    setNeoPixelColor(0, 0, 255);  // Azul
+    lcd.clear();
+    lock = 0;
+  } else {
+    lcd.clear();
+    lcd.setCursor(3, 0);
+    lcd.print("Tarjeta");
+    lcd.setCursor(3, 1);
+    lcd.print("incorrecta!");
+    digitalWrite(BUZZER_PIN, HIGH);  // Enciende el zumbador
+    setNeoPixelColor(255, 0, 0);  // Rojo
+    delay(1500);
+    digitalWrite(BUZZER_PIN, LOW);  // Apaga el zumbador
+    pixels.clear();      // Apaga todos los píxeles
+    pixels.show();
+    lcd.clear();
+  }
+}
+
+void setNeoPixelColor(uint8_t red, uint8_t green, uint8_t blue) {
+  for (int i = 0; i < NUM_PIXELS; i++) {
+    pixels.setPixelColor(i, pixels.Color(red, green, blue));
+  }
+  pixels.show();
+}
